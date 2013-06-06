@@ -2,7 +2,7 @@ INSTALL
 ==========
 
 1. Extract module into /sites/all/modules folder.
-2. Enable "Bmap" on /admin/modules page.
+2. Enable "Or calendar" on /admin/modules page.
 
 CONFIG
 ==========
