@@ -4,3 +4,4 @@ core = 7.x
 package = Orth
 configure = admin/config/user-interface/orth_canlendar
 dependencies[] = date
+dependencies[] = calendar
