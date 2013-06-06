@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function or_calendar_menu() {
+  $items = array();
+  $items['admin/config/user-interface/orth_or_calendar'] = array(
+    'title' => 'Orth Calendar',
+    'description' => 'Orth calendar settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('or_calendar_settings'),
+    'access arguments' => array('administer or calendar'),
+    'file' => 'or_calendar.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['calendar'] = array(
+    'title' => 'Orth Calendar',
+    'description' => 'Orth calendar',
+    'page callback' => 'or_calendar_page',
+    'access arguments' => array('or calendar view'),
+    'file' => 'or_calendar.pages.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function or_calendar_permission() {
+  return array(
+    'administer or calendar' => array(
+      'title' => t('Administer or calendar'),
+      'description' => t('Administer or calendar.'),
+    ),
+    'or calendar view' => array(
+      'title' => t('Or calendar view'),
+      'description' => t('Or calendar view.'),
+    ),
+  );
+}
+
+/**
+ * Adds our theme specificiations to the Theme Registry.
+ */
+function or_calendar_theme($existing, $type, $theme, $path) {
+  return array(
+    'or_calendar_header' => array(
+      'variables' => array('element' => NULL, 'plugin' => NULL),
+      'template' => 'or_calendar_header'
+    ),
+  );
+}
+
+/**
+ * Handler views.
+ */
+function or_calendar_handler_views($name) {
+  $handler_views_str = variable_get('or_calendar_views');
+  $handler_views = empty($handler_views_str) ? array() : explode("\r\n", $handler_views_str);
+  return !empty($handler_views) && in_array($name, $handler_views);
+}

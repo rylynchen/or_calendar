@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function or_calendar_uninstall() {
+  variable_del('or_calendar_start_year');
+  variable_del('or_calendar_extend_year');
+  variable_del('or_calendar_views');
+}

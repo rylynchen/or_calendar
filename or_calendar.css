@@ -1,0 +1,6 @@
+.orth_date_month_scroll #prev{background: none repeat scroll 0 0 #DFDFDF;border-radius: 5px 0 0 5px;float: none;font-size: 12px;padding: 5px 0;text-align: right;width: auto;z-index: 1;}
+.orth_date_month_scroll #next{background: none repeat scroll 0 0 #DFDFDF;border-radius: 0 5px 5px 0;float: none;font-size: 12px;padding: 5px 0;text-align: right;width: auto;z-index: 1;}
+.orth_date_month_scroll li{background: none repeat scroll 0 0 #DFDFDF;float: none;font-size: 12px;padding: 5px !important;text-align: right;width: auto;z-index: 1;display: inline;list-style-type: none;margin-right: 5px !important;}
+.orth_date_month_scroll a{font-weight: bold;color: inherit;font-size: 12px;text-decoration: none;font-weight: bold;}
+.orth_date_month_scroll div {display: inline;float: left;}
+.orth_date_month_scroll ul {margin:0 12px !important;float: left;padding: 0 !important;}

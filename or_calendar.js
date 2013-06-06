@@ -1,0 +1,11 @@
+var scrollPic_02 = new ScrollPic();
+scrollPic_02.scrollContId   = "orth_date_month_scroll_items";
+scrollPic_02.arrLeftId      = "prev";
+scrollPic_02.arrRightId     = "next";
+scrollPic_02.frameWidth     = 600;
+scrollPic_02.pageWidth      = 100;
+scrollPic_02.speed          = 10;
+scrollPic_02.space          = 5;
+scrollPic_02.autoPlay       = false;
+scrollPic_02.autoPlayTime   = 3;
+scrollPic_02.initialize();
