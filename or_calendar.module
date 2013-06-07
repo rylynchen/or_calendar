@@ -50,6 +50,16 @@ function or_calendar_theme($existing, $type, $theme, $path) {
       'variables' => array('element' => NULL, 'plugin' => NULL),
       'template' => 'or_calendar_header'
     ),
+    'or_calendar_map' => array(
+      'variables' => array(
+        'element' => NULL, 
+        'week' => NULL, 
+        'bmaps' => NULL, 
+        'start_year' => (int)variable_get('or_calendar_start_year', date('Y')), 
+        'end_year' => (int)(date('Y') + variable_get('or_calendar_extend_year', 0)),
+      ),
+      'template' => 'or_calendar_map'
+    ),
   );
 }
 
@@ -60,4 +70,119 @@ function or_calendar_handler_views($name) {
   $handler_views_str = variable_get('or_calendar_views');
   $handler_views = empty($handler_views_str) ? array() : explode("\r\n", $handler_views_str);
   return !empty($handler_views) && in_array($name, $handler_views);
+}
+
+/**
+ * Load template js & css.
+ *
+ * @param $plugin
+ */
+function or_calendar_tpl_load_js_css($plugin) {
+  $module_path = drupal_get_path('module', 'or_calendar');
+  drupal_add_css($module_path.'/or_calendar.css');
+  drupal_add_js(array('or_calendar' => array('month' => str_replace('-', '', $plugin->view->args[0]))), 'setting');
+  drupal_add_js($module_path.'/or_calendar.js', array('scope' => 'footer'));
+}
+
+/**
+ * Load template js & css.
+ *
+ * @param $plugin
+ */
+function or_calendar_map_tpl_load_js_css() {
+  $module_path = drupal_get_path('module', 'or_calendar');
+  drupal_add_css($module_path.'/or_calendar.css');
+  drupal_add_js($module_path.'/or_calendar.js', array('scope' => 'footer'));
+}
+
+/**
+ * Template months html.
+ *
+ * @param $plugin
+ */
+function or_calendar_tpl_months_html($plugin) {
+  $html = '';
+  // get visible months
+  $start_year = (int)variable_get('or_calendar_start_year', date('Y'));
+  $end_year = (int)(date('Y') + variable_get('or_calendar_extend_year', 0));
+  $current_month = $plugin->view->args[0];
+  $visible_months = array($current_month);
+  for ($i = 1; $i<=5; ++$i) {
+    $prev_month = date("Y-m", strtotime($current_month." -$i month"));
+    $next_month = date("Y-m", strtotime($current_month." +$i month"));
+    if ((int)date('Y', strtotime($next_month)) > $end_year) {
+      $m = 5 + $i;
+      $visible_months[] = date("Y-m", strtotime($current_month." -$m month"));
+    }
+    else {
+      $visible_months[] = $next_month;
+    }
+
+    if ((int)date('Y', strtotime($prev_month)) < $start_year) {
+      $n = 5 + $i;
+      $visible_months[] = date("Y-m", strtotime($current_month." +$n month"));
+    }
+    else {
+      $visible_months[] = $prev_month;
+    }
+  }
+  for($j = $start_year; $j <= $end_year; $j++) {
+    for($i = 1; $i <= 12; ++$i) {
+      $class = 'class="hidden"';
+      $href = current_path();
+      $month = $j.'-'.sprintf('%02d', $i);
+      $attr = array('query' => array('view' => 'calendar', 'month' => $month));
+      if (in_array($month, $visible_months)) {
+        $class = 'class="show"';
+        if ($month == $current_month) {
+          $class = 'class="show current"';
+          $attr = array('query' => array(), 'external' => TRUE);
+        }
+      }
+      $html .= '<li '.$class.' id="'.$month.'">'.l($month, $href, $attr).'</li>';
+    }
+  }
+  return $html;
+}
+
+/**
+ * Extends EntityFieldQuery, providing some useful added methods and some defaults
+ */
+class CalendarGetBidsByWeekEFQ extends EntityFieldQuery {
+  public $startTime;
+
+  public $endTime;
+
+  public function __construct($startTime, $endTime) {
+    $this->startTime = $startTime;
+    $this->endTime = $endTime;
+    $this
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'event')
+      ->propertyCondition('status', 1)
+      ->propertyOrderBy('created', 'DESC');
+    $this->calendarDate();
+  }
+
+  public function calendarDate() {
+    $this->addTag('calendardate');
+    return $this;
+  }
+
+  public function clearCalendarDate() {
+    unset($this->tags['calendardate']);
+  }
+}
+
+/**
+ * Implements hook_query_TAG_alter
+ *
+ * @param QueryAlterableInterface $query
+ */
+function or_calendar_query_calendardate_alter(QueryAlterableInterface $query) {
+  $query->leftJoin('field_data_field_date', 'd', 'node.nid = d.entity_id');
+  $or = db_or();
+  $or->condition('d.field_date_value', array($query->alterMetaData['entity_field_query']->startTime, $query->alterMetaData['entity_field_query']->endTime), 'BETWEEN')
+     ->condition('d.field_date_value2', array($query->alterMetaData['entity_field_query']->startTime, $query->alterMetaData['entity_field_query']->endTime), 'BETWEEN');
+  $query->condition($or);
 }

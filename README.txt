@@ -11,7 +11,7 @@ CONFIG
 
 <?php if (!empty($pager_prefix)) print $pager_prefix; ?>
 <div class="date-nav-wrapper clearfix<?php if (!empty($extra_classes)) print $extra_classes; ?>">
-  <?php if (or_calendar_handler_views($plugin->view->name)) :?>
+  <?php if (module_exists('or_calendar') && or_calendar_handler_views($plugin->view->name)) :?>
     <?php echo theme('or_calendar_header', array('plugin' => $plugin)); ?>
   <?php else: ?>
     <div class="date-nav item-list">
